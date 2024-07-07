@@ -3,8 +3,6 @@ import cv2
 import numpy as np
 from PIL import Image
 import tempfile
-import av
-import streamlit_webrtc as webrtc
 
 # Import your YOLO_Pred class here
 from yolo_predictions import YOLO_Pred
@@ -36,20 +34,21 @@ def process_video(video_file, model):
     vf.release()
 
 def process_camera(model):
-    ctx = webrtc.WebRTCContext(session_id="object-detection")
-    video_receiver = ctx.input("video")
-
+    cap = cv2.VideoCapture(0)
     stframe = st.empty()
 
-    while True:
-        try:
-            video_frame = video_receiver.get_frame(timeout=1)
-            img = video_frame.to_ndarray(format="bgr24")
-            result_rgb = process_image(img, model)
-            stframe.image(result_rgb)
-        except webrtc.StreamError as e:
-            print("Error occurred:", e)
+    while st.session_state.camera_on:
+        ret, frame = cap.read()
+        if not ret:
+            st.error("Failed to capture image from camera.")
             break
+        
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result_rgb = process_image(frame_rgb, model)
+        
+        stframe.image(result_rgb)
+    
+    cap.release()
 
 def main():
     st.title("Object Detection with YOLO")
@@ -87,7 +86,7 @@ def main():
             st.session_state.camera_on = not st.session_state.camera_on
             
             if st.session_state.camera_on:
-                webrtc_streamer(key="object-detection", video_receiver_factory=process_camera, model=model)
+                process_camera(model)
             else:
                 st.experimental_rerun()
 
