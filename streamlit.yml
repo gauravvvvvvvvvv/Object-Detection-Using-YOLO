@@ -1,2 +1,0 @@
-deploy:
-  apt_requirements_file: apt_requirements.txt
