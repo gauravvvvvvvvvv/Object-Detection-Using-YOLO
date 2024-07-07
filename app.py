@@ -47,8 +47,14 @@ def process_camera(model):
         result_rgb = process_image(frame_rgb, model)
         
         stframe.image(result_rgb)
+
+        # Check if the camera toggle button was pressed again
+        if not st.session_state.camera_on:
+            break
     
     cap.release()
+    st.stop()  # Stop the script cleanly when camera is turned off
+
 
 def main():
     st.title("Object Detection with YOLO")
