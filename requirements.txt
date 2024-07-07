@@ -9,4 +9,4 @@ streamlit
 opencv-python-headless 
 pillow 
 pyyaml
-libgl1-mesa-glx
+apt:libgl1-mesa-glx
