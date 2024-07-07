@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 from PIL import Image
 import tempfile
-from streamlit_webrtc import VideoTransformerBase, webrtc_streamer, WebRtcMode
-
+from streamlit_webrtc import VideoProcessorBase, webrtc_streamer, WebRtcMode
+from aiortc.mediastreams import VideoFrame
 # Import your YOLO_Pred class here
 from yolo_predictions import YOLO_Pred
 
@@ -22,64 +22,57 @@ WEBRTC_CLIENT_SETTINGS = {
 def load_model():
     return YOLO_Pred('./Model/weights/best.onnx', 'data.yaml')
 
-class YOLOTransformer(VideoTransformerBase):
+class YOLOTransformer(VideoProcessorBase):
     def __init__(self, model):
         self.model = model
 
-    def transform(self, frame):
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        result_rgb = process_image(frame_rgb, self.model)
-        return result_rgb
-
+    def recv(self, frame: VideoFrame) -> VideoFrame:
+        img = frame.to_ndarray(format="bgr24")
+        result_img, _ = self.model.predictions(img)  # Apply YOLO predictions
+        return VideoFrame.from_ndarray(result_img, format="bgr24")
 
 def process_image(image, model):
-    image_bgr = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-    result_image, _ = model.predictions(image_bgr)  # We're ignoring detected_classes here
-    result_rgb = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
-    return result_rgb
+    image_np = np.array(image)
+    result_image, _ = model.predictions(image_np)
+    return result_image
 
 def process_video(video_file, model):
     tfile = tempfile.NamedTemporaryFile(delete=False) 
     tfile.write(video_file.read())
-
     vf = cv2.VideoCapture(tfile.name)
     stframe = st.empty()
     while vf.isOpened():
         ret, frame = vf.read()
         if not ret:
             break
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        result_rgb = process_image(frame_rgb, model)
-        stframe.image(result_rgb)
+        result = process_image(frame, model)
+        stframe.image(result, channels="BGR")
         
     vf.release()
 
 def process_camera(model):
     ctx = webrtc_streamer(
         key="camera",
-        video_transformer_factory=lambda: YOLOTransformer(model),
-        async_transform=True,
-        mode=WebRtcMode.SENDRECV,  # Use the WebRtcMode enum
+        video_processor_factory=lambda: YOLOTransformer(model),
+        async_processing=True,
+        mode=WebRtcMode.SENDRECV,
         client_settings=WEBRTC_CLIENT_SETTINGS
     )
 
 def main():
     st.title("Object Detection with YOLO")
-
     # Load the YOLO model
     model = load_model()
-
     # Input type selection
     input_type = st.radio("Select input type:", ("Image", "Video", "Camera"))
-
     if input_type == "Image":
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
-            result_rgb = process_image(image, model)
+            result = process_image(image, model)
             
             # Display the result
-            st.image(result_rgb, caption='Processed Image', use_column_width=True)
+            st.image(result, caption='Processed Image', use_column_width=True, channels="BGR")
     
     elif input_type == "Video":
         uploaded_file = st.file_uploader("Choose a video...", type=["mp4", "avi", "mov"])
