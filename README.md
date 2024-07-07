@@ -4,7 +4,7 @@ This project implements a real-time object detection application using a custom 
 
 ## Try out the app.
 
-[Object-Orion](https://object-orion.streamlit.app/)
+You can try out the live demo of Object-Orion at our [Streamlit app](https://object-orion.streamlit.app/).
 
 ## Features
 
