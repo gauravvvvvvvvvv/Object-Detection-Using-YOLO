@@ -2,6 +2,10 @@
 
 This project implements a real-time object detection application using a custom YOLO-based model called Object-Orion. The application is built with Streamlit and offers multiple input options including image upload, video upload, and real-time camera feed.
 
+##Try out the app.
+
+[Object-Orion](object-orion.streamlit.app)
+
 ## Features
 
 - Real-time object detection using Object-Orion v1
