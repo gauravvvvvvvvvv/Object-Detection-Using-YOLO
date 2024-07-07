@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import tempfile
-
+from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
 # Import your YOLO_Pred class here
 from yolo_predictions import YOLO_Pred
 
@@ -11,6 +11,15 @@ from yolo_predictions import YOLO_Pred
 def load_model():
     return YOLO_Pred('./Model/weights/best.onnx', 'data.yaml')
 
+class YOLOTransformer(VideoTransformerBase):
+    def __init__(self, model):
+        self.model = model
+
+    def transform(self, frame):
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result_rgb = process_image(frame_rgb, self.model)
+        return result_rgb
+    
 def process_image(image, model):
     image_bgr = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     result_image, _ = model.predictions(image_bgr)  # We're ignoring detected_classes here
@@ -34,31 +43,24 @@ def process_video(video_file, model):
     vf.release()
 
 def process_camera(model):
-    cap = cv2.VideoCapture(0)
-    stframe = st.empty()
+    webrtc_ctx = webrtc_streamer(key="camera", video_transformer_factory=YOLOTransformer, async_transform=True, mode="async", client_settings=WEBRTC_CLIENT_SETTINGS)
+    if not webrtc_ctx.video_transformer:
+        return
 
-    while st.session_state.camera_on:
-        ret, frame = cap.read()
-        if not ret:
-            st.error("Failed to capture image from camera.")
+    while True:
+        if webrtc_ctx.video_transformer:
+            webrtc_ctx.video_transformer.model = model
+        else:
             break
-        
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        result_rgb = process_image(frame_rgb, model)
-        
-        stframe.image(result_rgb)
-    
-    cap.release()
-
+WEBRTC_CLIENT_SETTINGS = {
+    "minAspectRatio": 0.5625,
+    "maxAspectRatio": 0.5625,
+}
 def main():
     st.title("Object Detection with YOLO")
 
     # Load the YOLO model
     model = load_model()
-
-    # Initialize session state
-    if 'camera_on' not in st.session_state:
-        st.session_state.camera_on = False
 
     # Input type selection
     input_type = st.radio("Select input type:", ("Image", "Video", "Camera"))
@@ -79,7 +81,7 @@ def main():
             st.text("Video processing complete!")
     
     elif input_type == "Camera":
-        st.write("Click the button to start or stop the camera.")
+        process_camera(model)
         
         # Single button to toggle camera state
         if st.button('Toggle Camera' if not st.session_state.camera_on else 'Stop Camera'):
