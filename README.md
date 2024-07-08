@@ -7,7 +7,9 @@ This project implements a real-time object detection application using a custom 
 1. App doesnt work on web yet. You can try it running on your system.
 2. Download the code.
 3. Open the `Object-Detection-Using-YOLO` directory in any terminal.
-4. Run the command:  `streamlit run app.py`
+4. Run the commands:
+   `pip install -r requirements.txt`
+   `streamlit run app.py`
 
 Voila!
 
