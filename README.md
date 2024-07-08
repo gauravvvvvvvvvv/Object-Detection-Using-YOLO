@@ -13,6 +13,11 @@ You can try out the live demo of Object-Orion at our [Streamlit app](https://obj
 - User-friendly interface built with Streamlit
 - Asynchronous processing for smooth performance
 
+## Dataset : Pascal VOC
+
+The Pascal VOC dataset is a benchmark in computer vision, containing annotated images for object detection and classification tasks, with defined 20 object categories. [Pascal-VOC](https://www.kaggle.com/datasets/gauravnarlawar/pascalvoc/)
+
+
 ## Model: Object-Orion
 
 Object-Orion is a custom object detection model based on the YOLO (You Only Look Once) architecture. It's currently in its first version (v1) with an accuracy of approximately 60%. While it's still in development, it demonstrates promising results for real-time object detection tasks.
