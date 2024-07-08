@@ -27,14 +27,16 @@ class YOLOTransformer(VideoTransformerBase):
         self.model = model
 
     def transform(self, frame):
-        img = frame.to_ndarray(format="bgr24")
-        result_img, _ = self.model.predictions(img)  # Apply YOLO predictions
-        return result_img  # Return the result without color conversion
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result_rgb = process_image(frame_rgb, self.model)
+        return result_rgb
+
 
 def process_image(image, model):
-    image_np = np.array(image)
-    result_image, _ = model.predictions(image_np)
-    return result_image
+    image_bgr = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    result_image, _ = model.predictions(image_bgr)  # We're ignoring detected_classes here
+    result_rgb = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
+    return result_rgb
 
 def process_video(video_file, model):
     tfile = tempfile.NamedTemporaryFile(delete=False) 
@@ -46,8 +48,9 @@ def process_video(video_file, model):
         ret, frame = vf.read()
         if not ret:
             break
-        result = process_image(frame, model)
-        stframe.image(result, channels="BGR")
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result_rgb = process_image(frame_rgb, model)
+        stframe.image(result_rgb)
         
     vf.release()
 
@@ -56,7 +59,7 @@ def process_camera(model):
         key="camera",
         video_transformer_factory=lambda: YOLOTransformer(model),
         async_transform=True,
-        mode=WebRtcMode.SENDRECV,
+        mode=WebRtcMode.SENDRECV,  # Use the WebRtcMode enum
         client_settings=WEBRTC_CLIENT_SETTINGS
     )
 
@@ -73,10 +76,10 @@ def main():
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
-            result = process_image(image, model)
+            result_rgb = process_image(image, model)
             
             # Display the result
-            st.image(result, caption='Processed Image', use_column_width=True, channels="BGR")
+            st.image(result_rgb, caption='Processed Image', use_column_width=True)
     
     elif input_type == "Video":
         uploaded_file = st.file_uploader("Choose a video...", type=["mp4", "avi", "mov"])
