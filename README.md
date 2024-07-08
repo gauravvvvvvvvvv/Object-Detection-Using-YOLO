@@ -4,7 +4,13 @@ This project implements a real-time object detection application using a custom 
 
 ## Try out the app.
 
-You can try out the live demo of Object-Orion at our [Streamlit app](https://object-orion.streamlit.app/).
+App doesnt work on web yet. You can try it running on your system.
+Download the code.
+Open the *Object-Detection-Using-YOLO* directory in any terminal.
+Run the command: 
+streamlit run app.py
+
+Voila!
 
 ## Features
 
