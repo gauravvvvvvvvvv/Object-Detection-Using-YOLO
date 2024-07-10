@@ -8,15 +8,15 @@ from streamlit_webrtc import VideoTransformerBase, webrtc_streamer, WebRtcMode
 # Import your YOLO_Pred class here
 from yolo_predictions import YOLO_Pred
 
-WEBRTC_CLIENT_SETTINGS = {
-    "rtcConfiguration": {
-        "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-    },
-    "mediaStreamConstraints": {
-        "video": True,
-        "audio": False,
-    },
-}
+# WEBRTC_CLIENT_SETTINGS = {
+#     "rtcConfiguration": {
+#         "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+#     },
+#     "mediaStreamConstraints": {
+#         "video": True,
+#         "audio": False,
+#     },
+# }
 
 @st.cache_resource
 def load_model():
@@ -51,14 +51,14 @@ def process_video(video_file, model):
         
     vf.release()
 
-def process_camera(model):
-    ctx = webrtc_streamer(
-        key="camera",
-        video_transformer_factory=lambda: YOLOTransformer(model),
-        async_transform=True,
-        mode=WebRtcMode.SENDRECV,
-        client_settings=WEBRTC_CLIENT_SETTINGS
-    )
+# def process_camera(model):
+#     ctx = webrtc_streamer(
+#         key="camera",
+#         video_transformer_factory=lambda: YOLOTransformer(model),
+#         async_transform=True,
+#         mode=WebRtcMode.SENDRECV,
+#         client_settings=WEBRTC_CLIENT_SETTINGS
+#     )
 
 def main():
     st.title("Object Detection with YOLO")
@@ -84,8 +84,8 @@ def main():
             process_video(uploaded_file, model)
             st.text("Video processing complete!")
     
-    elif input_type == "Camera":
-        process_camera(model)
+    # elif input_type == "Camera":
+    #     process_camera(model)
 
 if __name__ == "__main__":
     main()
