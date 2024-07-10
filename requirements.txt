@@ -5,9 +5,14 @@ opencv-python
 jupyter
 torch
 torchvision
-streamlit
-opencv-python-headless 
 pillow 
 pyyaml
 streamlit_webrtc 
 aiortc
+streamlit==1.28.0
+opencv-python-headless==4.8.1.78
+numpy==1.26.0
+Pillow==10.0.1
+streamlit-webrtc==0.47.1
+onnxruntime==1.15.1
+pyyaml==6.0.1
