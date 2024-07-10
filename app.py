@@ -67,7 +67,7 @@ def main():
     model = load_model()
 
     # Input type selection
-    input_type = st.radio("Select input type:", ("Image", "Video", "Camera"))
+    input_type = st.radio("Select input type:", ("Image", "Video"))
 
     if input_type == "Image":
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
