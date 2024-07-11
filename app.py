@@ -29,7 +29,7 @@ class YOLOTransformer(VideoTransformerBase):
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
         result_img, _ = self.model.predictions(img)  # Apply YOLO predictions
-        return result_img
+        return result_img  # Return the result without color conversion
 
 def process_image(image, model):
     image_np = np.array(image)
@@ -38,30 +38,28 @@ def process_image(image, model):
     return result_image
 
 def process_video(video_file, model):
-    # TO DO: Implement video processing
-    st.text("Video processing not implemented yet!")
-    
+    tfile = tempfile.NamedTemporaryFile(delete=False) 
+    tfile.write(video_file.read())
+
+    vf = cv2.VideoCapture(tfile.name)
+    stframe = st.empty()
+    while vf.isOpened():
+        ret, frame = vf.read()
+        if not ret:
+            break
+        result = process_image(frame, model)
+        stframe.image(result, channels="BGR")
+        
+    vf.release()
+
 def process_camera(model):
     ctx = webrtc_streamer(
         key="camera",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration={
-            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-        },
         video_transformer_factory=lambda: YOLOTransformer(model),
         async_transform=True,
+        mode=WebRtcMode.SENDRECV,
         client_settings=WEBRTC_CLIENT_SETTINGS
     )
-
-    if ctx.state.playing:
-        st.write("Camera is running!")
-        while True:
-            try:
-                frame = ctx.input_frame.to_ndarray(format="bgr24")
-                result_img, _ = model.predictions(frame)  # Apply YOLO predictions
-                st.image(result_img, channels="BGR")
-            except Exception as e:
-                st.error("Error processing video frame: " + str(e))
 
 def main():
     st.title("Object Detection with YOLO")
