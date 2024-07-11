@@ -38,20 +38,23 @@ def process_image(image, model):
     result_image, _ = model.predictions(image_np)
     return result_image
 
-def process_video(video_file, model):
-    tfile = tempfile.NamedTemporaryFile(delete=False) 
-    tfile.write(video_file.read())
+def process_camera(model):
+    ctx = webrtc_streamer(
+        key="camera",
+        video_transformer_factory=lambda: YOLOTransformer(model),
+        async_transform=True,
+        mode=WebRtcMode.SENDRECV,
+        client_settings=WEBRTC_CLIENT_SETTINGS
+    )
 
-    vf = cv2.VideoCapture(tfile.name)
-    stframe = st.empty()
-    while vf.isOpened():
-        ret, frame = vf.read()
-        if not ret:
-            break
-        result = process_image(frame, model)
-        stframe.image(result, channels="BGR")
-        
-    vf.release()
+    if ctx.state.playing:
+        st.write("Camera is running!")
+        while True:
+            try:
+                frame = ctx.video_transformer.transform(ctx.video_frame)
+                st.image(frame, channels="BGR")
+            except Exception as e:
+                st.error("Error processing video frame: " + str(e))
 
 
 def process_camera(model):
