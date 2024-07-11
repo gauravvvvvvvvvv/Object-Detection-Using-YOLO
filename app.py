@@ -5,6 +5,7 @@ from PIL import Image
 import tempfile
 from streamlit_webrtc import VideoTransformerBase, webrtc_streamer, WebRtcMode
 
+
 # Import your YOLO_Pred class here
 from yolo_predictions import YOLO_Pred
 
@@ -52,14 +53,23 @@ def process_video(video_file, model):
         
     vf.release()
 
+
 def process_camera(model):
     ctx = webrtc_streamer(
         key="camera",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
         video_transformer_factory=lambda: YOLOTransformer(model),
         async_transform=True,
-        mode=WebRtcMode.SENDRECV,
         client_settings=WEBRTC_CLIENT_SETTINGS
     )
+
+    if ctx.state.playing:
+        st.write("Camera is running!")
+    else:
+        st.write("Camera is not running.")
 
 def main():
     st.title("Object Detection with YOLO")
