@@ -53,13 +53,8 @@ def process_video(video_file, model):
     vf.release()
 
 def process_camera(model):
-    ctx = webrtc_streamer(
-        key="camera",
-        video_transformer_factory=lambda: YOLOTransformer(model),
-        async_transform=True,
-        mode=WebRtcMode.SENDRECV,
-        client_settings=WEBRTC_CLIENT_SETTINGS
-    )
+
+    webrtc_streamer(key="sample")
 
 def main():
     st.title("Object Detection with YOLO")
