@@ -54,8 +54,9 @@ def process_camera(model):
         st.write("Camera is running!")
         while True:
             try:
-                frame = ctx.video_transformer.transform(ctx.video_frame)
-                st.image(frame, channels="BGR")
+                frame = ctx.input_frame  # Get the input frame
+                transformed_frame = ctx.video_transformer.transform(frame)  # Transform the frame
+                st.image(transformed_frame, channels="BGR")
             except Exception as e:
                 st.error("Error processing video frame: " + str(e))
 
