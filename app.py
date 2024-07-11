@@ -42,18 +42,26 @@ def process_video(video_file, model):
     st.text("Video processing not implemented yet!")
     
 def process_camera(model):
-    webrtc_ctx = webrtc_streamer(
+    ctx = webrtc_streamer(
         key="camera",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
         video_transformer_factory=lambda: YOLOTransformer(model),
         async_transform=True,
-        mode=WebRtcMode.SENDRECV,
         client_settings=WEBRTC_CLIENT_SETTINGS
     )
 
-    if webrtc_ctx.state.playing:
+    if ctx.state.playing:
         st.write("Camera is running!")
-    else:
-        st.write("Camera is not running.")
+        while True:
+            try:
+                frame = ctx.input_frame.to_ndarray(format="bgr24")
+                result_img, _ = model.predictions(frame)  # Apply YOLO predictions
+                st.image(result_img, channels="BGR")
+            except Exception as e:
+                st.error("Error processing video frame: " + str(e))
 
 def main():
     st.title("Object Detection with YOLO")
