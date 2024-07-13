@@ -17,7 +17,7 @@ class YOLO_Pred():
         self.yolo.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
         self.yolo.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
-    def predictions(self, image):
+    def predictions(self, image, confidence_threshold):
         row, col, d = image.shape
         # convert image into square image (array)
         max_rc = max(row, col)
@@ -42,7 +42,7 @@ class YOLO_Pred():
         for i in range(len(detections)):
             row = detections[i]
             confidence = row[4]  # confidence of detection an object
-            if confidence > 0.4:
+            if confidence > confidence_threshold:
                 class_score = row[5:].max()  # maximum probability from 20 objects
                 class_id = row[5:].argmax()  # get the index position at which max probability occur
 
