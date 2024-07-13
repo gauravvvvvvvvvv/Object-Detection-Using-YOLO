@@ -4,7 +4,7 @@ This project implements a real-time object detection application using a custom 
 
 ## Try out the app. [object-orion](https://object-orion.streamlit.app/)
 
-1. Camera module doesnt work on web yet. You can try it running on your system.
+1. Camera module doesnt work on web yet. You can try running it on your system.
 2. Download the code.
 3. Open the `Object-Detection-Using-YOLO` directory in any terminal.
 4. Run the commands:
