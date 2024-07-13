@@ -27,7 +27,7 @@ The Pascal VOC dataset is a benchmark in computer vision, containing annotated i
 
 ## Model: Object-Orion
 
-Object-Orion is a custom object detection model based on the YOLO (You Only Look Once) architecture. It's currently in its first version (v1) with an accuracy of approximately 60%. While it's still in development, it demonstrates promising results for real-time object detection tasks.
+Object-Orion is a custom object detection model based on the YOLO (You Only Look Once) architecture. It's currently in its first version (v1) with an accuracy of approximately 69%. While it's still in development, it demonstrates promising results for real-time object detection tasks.
 
 For more information about Object-Orion, visit [Object-Orion](https://github.com/gauravvvvvvvvvv/object-orion).
 
