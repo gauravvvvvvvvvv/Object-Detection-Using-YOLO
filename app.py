@@ -52,16 +52,7 @@ def process_video(video_file, model, confidence_threshold):
         stframe.image(result, channels="BGR")
         
     vf.release()
-
-def process_camera(model):
-    ctx = webrtc_streamer(
-        key="camera",
-        video_transformer_factory=lambda: YOLOTransformer(model),
-        async_transform=True,
-        mode=WebRtcMode.SENDRECV,
-        client_settings=WEBRTC_CLIENT_SETTINGS
-    )
-
+    
 def main():
     st.title("Object Detection with YOLO")
 
@@ -78,7 +69,7 @@ def main():
 
     # Sidebar with input options
     st.sidebar.title("Input Options")
-    input_type = st.sidebar.selectbox("Select input type:", options=[None, "Image", "Video", "Camera"], index=0)
+    input_type = st.sidebar.selectbox("Select input type:", options=[None, "Image", "Video"], index=0)
 
     if input_type == "Image":
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
@@ -95,8 +86,5 @@ def main():
             process_video(uploaded_file, model, confidence_threshold)
             st.text("Video processing complete!")
     
-    elif input_type == "Camera":
-        process_camera(model)
-
 if __name__ == "__main__":
     main()
