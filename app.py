@@ -18,26 +18,27 @@ WEBRTC_CLIENT_SETTINGS = {
     },
 }
 
-@st.cache_resource
+@st.cache_resource()
 def load_model():
     return YOLO_Pred('./Model/weights/best.onnx', 'data.yaml')
 
 class YOLOTransformer(VideoTransformerBase):
     def __init__(self, model):
         self.model = model
+        self.confidence_threshold = 0.4  # Initial confidence threshold
 
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
-        result_img, _ = self.model.predictions(img)  # Apply YOLO predictions
+        result_img, _ = self.model.predictions(img, self.confidence_threshold)  # Apply YOLO predictions
         return result_img  # Return the result without color conversion
 
-def process_image(image, model):
+def process_image(image, model, confidence_threshold):
     image_np = np.array(image)
     image_np = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)  # Convert to BGR
-    result_image, _ = model.predictions(image_np)
+    result_image, _ = model.predictions(image_np, confidence_threshold)
     return result_image
 
-def process_video(video_file, model):
+def process_video(video_file, model, confidence_threshold):
     tfile = tempfile.NamedTemporaryFile(delete=False) 
     tfile.write(video_file.read())
 
@@ -47,7 +48,7 @@ def process_video(video_file, model):
         ret, frame = vf.read()
         if not ret:
             break
-        result = process_image(frame, model)
+        result = process_image(frame, model, confidence_threshold)
         stframe.image(result, channels="BGR")
         
     vf.release()
@@ -67,14 +68,23 @@ def main():
     # Load the YOLO model
     model = load_model()
 
-    # Input type selection
-    input_type = st.radio("Select input type:", ("Image", "Video", "Camera"))
+    # Show balloons only once per session
+    if st.session_state.get('first_load', True):
+        st.balloons()
+        st.session_state['first_load'] = False
+
+    # Confidence threshold slider in sidebar
+    confidence_threshold = st.sidebar.slider("Confidence Threshold", 0.0, 1.0, 0.4, 0.05)
+
+    # Sidebar with input options
+    st.sidebar.title("Input Options")
+    input_type = st.sidebar.selectbox("Select input type:", options=[None, "Image", "Video", "Camera"], index=0)
 
     if input_type == "Image":
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
-            result = process_image(image, model)
+            result = process_image(image, model, confidence_threshold)
             
             # Display the result
             st.image(result, caption='Processed Image', use_column_width=True, channels="BGR")
@@ -82,7 +92,7 @@ def main():
     elif input_type == "Video":
         uploaded_file = st.file_uploader("Choose a video...", type=["mp4", "avi", "mov"])
         if uploaded_file is not None:
-            process_video(uploaded_file, model)
+            process_video(uploaded_file, model, confidence_threshold)
             st.text("Video processing complete!")
     
     elif input_type == "Camera":
