@@ -64,27 +64,27 @@ def main():
         st.balloons()
         st.session_state['first_load'] = False
 
-    # Confidence threshold slider in sidebar
-    confidence_threshold = st.sidebar.slider("Confidence Threshold", 0.0, 1.0, 0.4, 0.05)
+    # Confidence threshold slider
+    confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.4, 0.05)
 
-    # Sidebar with input options
-    st.sidebar.title("Input Options")
-    input_type = st.sidebar.selectbox("Select input type:", options=[None, "Image", "Video"], index=0)
+    # Input options
+    st.title("Input Options")
+    input_type = st.selectbox("Select input type:", options=[None, "Image", "Video"], index=0)
 
     if input_type == "Image":
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
             result = process_image(image, model, confidence_threshold)
-            
+
             # Display the result
             st.image(result, caption='Processed Image', use_column_width=True, channels="BGR")
-    
+
     elif input_type == "Video":
         uploaded_file = st.file_uploader("Choose a video...", type=["mp4", "avi", "mov"])
         if uploaded_file is not None:
             process_video(uploaded_file, model, confidence_threshold)
             st.text("Video processing complete!")
-    
+
 if __name__ == "__main__":
     main()
