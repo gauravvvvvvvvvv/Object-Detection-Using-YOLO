@@ -69,7 +69,7 @@ def main():
 
     # Input options
     st.title("Input Options")
-    input_type = st.selectbox("Select input type:", options=[None, "Image", "Video"], index=0)
+    input_type = st.selectbox("Select input type:", options=["Image", "Video"], index=0)
 
     if input_type == "Image":
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
