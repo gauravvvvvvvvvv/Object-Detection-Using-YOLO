@@ -66,7 +66,7 @@ def main():
 
     # Confidence threshold slider
     confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.4, 0.05)
-    st.text("Adjust for number of detections or accuracy!")
+    st.text("Low for number of detections. High for accuracy.")
 
     # Input options
     st.title("Input Options")
