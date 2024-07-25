@@ -5,7 +5,7 @@ opencv-python==4.8.1.78
 jupyter==1.0.0
 torch==2.1.0
 torchvision==0.16.0
-Pillow==10.0.1
+Pillow==10.3.0
 pyyaml==6.0.1
 streamlit==1.28.0
 streamlit-webrtc==0.47.7
