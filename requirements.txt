@@ -3,7 +3,7 @@ pandas==2.2.2
 matplotlib==3.7.3
 opencv-python==4.8.1.78
 jupyter==1.0.0
-torch==2.1.0
+torch==2.2.0
 torchvision==0.16.0
 Pillow==10.3.0
 pyyaml==6.0.1
