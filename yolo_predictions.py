@@ -15,7 +15,8 @@ class YOLO_Pred():
         # load YOLO model
         self.yolo = cv2.dnn.readNetFromONNX(onnx_model)
         self.yolo.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-        self.yolo.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+        # Set target to GPU
+        self.yolo.setPreferableTarget(cv2.dnn.DNN_TARGET_OPENCL)
 
     def predictions(self, image, confidence_threshold):
         row, col, d = image.shape
@@ -92,6 +93,9 @@ class YOLO_Pred():
 
         return image, detected_classes  # Return both the image and the list of detected classes
 
+    
+
+        
     def generate_colors(self, ID):
         np.random.seed(10)
         colors = np.random.randint(100, 255, size=(self.nc, 3)).tolist()
