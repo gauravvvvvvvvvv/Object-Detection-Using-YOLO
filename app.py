@@ -21,7 +21,6 @@ WEBRTC_CLIENT_SETTINGS = {
 }
 
 @st.cache_resource()
-@st.cache_resource()
 def load_model():
     return YOLO_Pred('./Model/weights/best.onnx', 'data.yaml')
 
