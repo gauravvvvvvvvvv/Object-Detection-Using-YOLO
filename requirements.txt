@@ -4,8 +4,8 @@ matplotlib==3.7.3
 opencv-python==4.8.1.78
 opencv-python-headless==4.8.1.78
 jupyter==1.0.0
-torch==2.2.0
-torchvision==0.17.2     # Updated for Python 3.11
+torch==2.2.2
+torchvision==0.17.2
 Pillow==10.3.0
 pyyaml==6.0.1
 streamlit==1.30.0
