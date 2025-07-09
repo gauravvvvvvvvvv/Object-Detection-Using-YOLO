@@ -21,8 +21,9 @@ WEBRTC_CLIENT_SETTINGS = {
 }
 
 @st.cache_resource()
+@st.cache_resource()
 def load_model():
-    return YOLO_Pred('./Model3/weights/best.onnx', 'data.yaml')
+    return YOLO_Pred('./Model/weights/best.onnx', 'data.yaml')
 
 class YOLOTransformer(VideoTransformerBase):
     def __init__(self, model):
